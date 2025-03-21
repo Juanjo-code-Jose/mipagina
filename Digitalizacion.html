@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<link rel="stylesheet" href="practica.css">
+</head>
+<body>
+	<header>
+		<div class="logo">Logo</div>
+		<nav class="menu">
+			<a href="#">Home</a>
+			<a href="#">About</a>
+			<a href="#">Contact</a>
+		</nav>
+	</header>
+	<main>
+		<section>
+			<h1>Welcome</h1>
+			<p>This is a basic HTML structure.</p>
+			<!-- Video Element -->
+			<video id="video" width="640" height="480" autoplay playsinline muted></video>
+			
+			<script>
+				// Access the video element
+				const video = document.getElementById('video');
+				const predictionsList = document.getElementById('predictions-list');
+			
+				// Load the MobileNet model and start video processing
+				async function loadModel() {
+					const model = await mobilenet.load();
+					console.log('MobileNet model loaded:', model);
+			
+					// Access the user's webcam (rear camera)
+					if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+						navigator.mediaDevices.getUserMedia({
+							video: {
+								facingMode: { exact: "environment" } // Use the rear camera
+							}
+						})
+						.then((stream) => {
+							video.srcObject = stream; // Assign the stream to the video element
+							video.addEventListener('loadeddata', () => {
+								processVideo(model);
+							});
+						})
+						.catch((err) => console.error('Error accessing webcam:', err));
+					}
+				}
+			
+				// Process video frames and make predictions
+				async function processVideo(model) {
+					const canvas = document.createElement('canvas');
+					const ctx = canvas.getContext('2d');
+					canvas.width = video.width;
+					canvas.height = video.height;
+			
+					async function predict() {
+						ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+						const predictions = await model.classify(canvas);
+			
+						// Display predictions
+						predictionsList.innerHTML = '';
+						predictions.forEach((prediction) => {
+							const li = document.createElement('li');
+							li.textContent = `${prediction.className}: ${prediction.probability.toFixed(2)}`;
+							predictionsList.appendChild(li);
+						});
+			
+						requestAnimationFrame(predict);
+					}
+			
+					predict();
+				}
+			
+				loadModel();
+			</script>
+			<!-- Results Container -->
+			<div id="results">
+				<h2>Predictions:</h2>
+				<ul id="predictions-list"></ul>
+			</div>
+		</section>
+		<aside>
+			<p>Sidebar content</p>
+		</aside>
+		</main>
+		<footer>
+			<div class="autor">Author Name</div>
+			<div class="reder-sociales">Social Media Links</div>
+		</footer>
+				
+				<!-- TensorFlow.js Library -->
+				<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+				<script>
+					// Load the MobileNet model using TensorFlow.js
+					async function loadModel() {
+						// Load the MobileNet model from TensorFlow.js
+						const model = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
+						console.log('MobileNet model loaded:', model);
+				
+						// Access the user's webcam
+						if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+							navigator.mediaDevices.getUserMedia({ video: true })
+								.then((stream) => {
+									video.srcObject = stream;
+									video.addEventListener('loadeddata', () => {
+										processVideo(model);
+									});
+								})
+								.catch((err) => console.error('Error accessing webcam:', err));
+						}
+					}
+				
+					// Process video frames and make predictions
+					async function processVideo(model) {
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+						canvas.width = video.width;
+						canvas.height = video.height;
+				
+						async function predict() {
+							ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+							const input = tf.browser.fromPixels(canvas).resizeNearestNeighbor([224, 224]).toFloat().expandDims();
+							const predictions = model.predict(input).dataSync();
+							
+							// Display predictions (you can map predictions to class names if needed)
+							console.log(predictions);
+							
+							requestAnimationFrame(predict);
+						}
+		
+						predict();
+					}
+		
+					loadModel();
+				</script>
+		
+		<!-- TensorFlow.js Library -->
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+		<!-- MobileNet Model -->
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+		<script>
+		
+			// Load the MobileNet model and start video processing
+			async function loadModel() {
+				const model = await mobilenet.load();
+				console.log('MobileNet model loaded:', model);
+		
+				// Access the user's webcam
+				if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+					navigator.mediaDevices.getUserMedia({ video: true })
+						.then((stream) => {
+							video.srcObject = stream;
+							video.addEventListener('loadeddata', () => {
+								processVideo(model);
+							});
+						})
+						.catch((err) => console.error('Error accessing webcam:', err));
+				}
+			}
+		
+			// Process video frames and make predictions
+			async function processVideo(model) {
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				canvas.width = video.width;
+				canvas.height = video.height;
+		
+				async function predict() {
+					ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+					const predictions = await model.classify(canvas);
+		
+					// Display predictions
+					predictionsList.innerHTML = '';
+					predictions.forEach((prediction) => {
+						const li = document.createElement('li');
+						li.textContent = `${prediction.className}: ${prediction.probability.toFixed(2)}`;
+						predictionsList.appendChild(li);
+					});
+		
+					requestAnimationFrame(predict);
+				}
+		
+				predict();
+			}
+		
+			loadModel();
+		</script>
+
+	<!-- TensorFlow.js Library -->
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+	<!-- MobileNet Model -->
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+	<script>
+		// Example usage of MobileNet
+		async function loadModel() {
+			const model = await mobilenet.load();
+			console.log('MobileNet model loaded:', model);
+		}
+		loadModel();
+	</script>
+</body>
+</html>
